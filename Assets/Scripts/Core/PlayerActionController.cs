@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using ChronoDepths.TimeSystem;
 
 namespace ChronoDepths.Core
@@ -28,12 +29,12 @@ namespace ChronoDepths.Core
 
         private void Update()
         {
-            if (Input.GetButtonDown("Fire1"))
+            if (IsPrimaryFireTriggered())
             {
                 TriggerAction();
             }
 
-            if (Input.GetButton("Fire1"))
+            if (IsPrimaryFireHeld())
             {
                 timeController.NotifyActionPerformed(actionIntensity);
             }
@@ -57,6 +58,18 @@ namespace ChronoDepths.Core
             yield return new WaitForSeconds(actionDuration);
             timeController.BeginExplorationPhase();
             actionActive = false;
+        }
+
+        private static bool IsPrimaryFireTriggered()
+        {
+            Mouse mouse = Mouse.current;
+            return mouse != null && mouse.leftButton.wasPressedThisFrame;
+        }
+
+        private static bool IsPrimaryFireHeld()
+        {
+            Mouse mouse = Mouse.current;
+            return mouse != null && mouse.leftButton.isPressed;
         }
     }
 }

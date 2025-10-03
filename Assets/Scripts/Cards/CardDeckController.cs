@@ -10,14 +10,14 @@ namespace ChronoDepths.Cards
     public sealed class CardDeckController : MonoBehaviour
     {
         [SerializeField]
-        private List<CardData> startingDeck = new();
+        private List<CardData> startingDeck = new List<CardData>();
 
         [SerializeField]
         private int handSize = 5;
 
-        private readonly List<CardData> drawPile = new();
-        private readonly List<CardData> hand = new();
-        private readonly List<CardData> discardPile = new();
+        private readonly List<CardData> drawPile = new List<CardData>();
+        private readonly List<CardData> hand = new List<CardData>();
+        private readonly List<CardData> discardPile = new List<CardData>();
         private System.Random rng;
 
         public IReadOnlyList<CardData> Hand => hand;

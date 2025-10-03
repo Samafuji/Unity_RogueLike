@@ -19,8 +19,8 @@ namespace ChronoDepths.Dungeon
         [SerializeField]
         private bool clearPrevious = true;
 
-        private readonly Dictionary<Vector2Int, GameObject> spawnedRooms = new();
-        private readonly List<Vector2Int> traversalOrder = new();
+        private readonly Dictionary<Vector2Int, GameObject> spawnedRooms = new Dictionary<Vector2Int, GameObject>();
+        private readonly List<Vector2Int> traversalOrder = new List<Vector2Int>();
         private System.Random pseudoRandom;
         private GameObject fallbackRoomPrefab;
 
@@ -36,24 +36,6 @@ namespace ChronoDepths.Dungeon
 
             int roomBudget = GetRoomBudget();
             for (int i = 1; i < roomBudget; i++)
-            if (config == null)
-            {
-                Debug.LogError("DungeonGenerator requires a DungeonConfig to operate.");
-                return;
-            }
-
-            if (config.DefaultRoomPrefab == null)
-            {
-                Debug.LogError("DungeonConfig is missing a default room prefab reference.");
-                return;
-            }
-
-            PrepareGeneration();
-
-            Vector2Int currentPosition = Vector2Int.zero;
-            SpawnRoom(currentPosition, config.DefaultRoomPrefab);
-
-            for (int i = 1; i < config.RoomBudget; i++)
             {
                 Vector2Int nextPosition = StepToNextCoordinate(currentPosition);
                 if (spawnedRooms.ContainsKey(nextPosition))
@@ -63,7 +45,6 @@ namespace ChronoDepths.Dungeon
                 }
 
                 GameObject prefab = ResolveRoomPrefab(i, roomBudget);
-                GameObject prefab = SelectRoomPrefab(i, config.RoomBudget);
                 SpawnRoom(nextPosition, prefab);
                 currentPosition = nextPosition;
             }
@@ -96,14 +77,13 @@ namespace ChronoDepths.Dungeon
             spawnedRooms.Clear();
             traversalOrder.Clear();
             int seed = config != null ? config.Seed : 0;
-            int seed = config.Seed;
             seed = seed == 0 ? Random.Range(int.MinValue, int.MaxValue) : seed;
             pseudoRandom = new System.Random(seed);
         }
 
         private void SpawnRoom(Vector2Int gridPosition, GameObject prefab)
         {
-            Vector3 worldPosition = new(gridPosition.x * 20f, 0f, gridPosition.y * 20f);
+            Vector3 worldPosition = new Vector3(gridPosition.x * 20f, 0f, gridPosition.y * 20f);
             GameObject roomInstance;
             if (prefab != null)
             {
@@ -113,7 +93,6 @@ namespace ChronoDepths.Dungeon
             {
                 roomInstance = CreateFallbackRoomInstance(worldPosition);
             }
-            GameObject roomInstance = Instantiate(prefab, worldPosition, Quaternion.identity, dungeonRoot);
             spawnedRooms.Add(gridPosition, roomInstance);
             traversalOrder.Add(gridPosition);
         }
@@ -130,7 +109,6 @@ namespace ChronoDepths.Dungeon
 
             Vector2Int candidate;
             Vector2Int gridExtents = GetGridSize();
-            Vector2Int gridExtents = config.GridSize;
             int guard = 0;
             do
             {
@@ -223,20 +201,6 @@ namespace ChronoDepths.Dungeon
                 }
             }
             return instance;
-        private GameObject SelectRoomPrefab(int index, int totalCount)
-        {
-            if (config.SpecialRoomPrefabs == null || config.SpecialRoomPrefabs.Length == 0)
-            {
-                return config.DefaultRoomPrefab;
-            }
-
-            float progress = (float)index / totalCount;
-            if (progress > 0.8f)
-            {
-                return config.SpecialRoomPrefabs[pseudoRandom.Next(config.SpecialRoomPrefabs.Length)];
-            }
-
-            return config.DefaultRoomPrefab;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace ChronoDepths.Dungeon
         private int seed;
 
         public int RoomBudget => Mathf.Max(1, roomBudget);
-        public Vector2Int GridSize => new(Mathf.Max(2, gridSize.x), Mathf.Max(2, gridSize.y));
+        public Vector2Int GridSize => new Vector2Int(Mathf.Max(2, gridSize.x), Mathf.Max(2, gridSize.y));
         public GameObject DefaultRoomPrefab => defaultRoomPrefab;
         public GameObject[] SpecialRoomPrefabs => specialRoomPrefabs;
         public int Seed => seed;
