@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using ChronoDepths.TimeSystem;
 
 namespace ChronoDepths.Core
@@ -29,9 +30,8 @@ namespace ChronoDepths.Core
 
         private void HandleMovement()
         {
-            float horizontal = Input.GetAxisRaw("Horizontal");
-            float vertical = Input.GetAxisRaw("Vertical");
-            Vector3 input = new Vector3(horizontal, 0f, vertical);
+            Vector2 movement = ReadMovementInput();
+            Vector3 input = new Vector3(movement.x, 0f, movement.y);
 
             bool hasInput = input.sqrMagnitude > 0.01f;
             if (hasInput)
@@ -51,7 +51,7 @@ namespace ChronoDepths.Core
 
         private void HandleRotation(Vector3 input, bool hasInput)
         {
-            float mouseX = Input.GetAxis("Mouse X");
+            float mouseX = ReadMouseDeltaX();
             if (Mathf.Abs(mouseX) > 0.01f)
             {
                 transform.Rotate(Vector3.up, mouseX * turnSpeed * Time.deltaTime);
@@ -75,6 +75,56 @@ namespace ChronoDepths.Core
             {
                 timeController.NotifyActionPerformed(intensity);
             }
+        }
+
+        private static Vector2 ReadMovementInput()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null)
+            {
+                return Vector2.zero;
+            }
+
+            Vector2 movement = Vector2.zero;
+
+            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+            {
+                movement.y += 1f;
+            }
+
+            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+            {
+                movement.y -= 1f;
+            }
+
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+            {
+                movement.x += 1f;
+            }
+
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+            {
+                movement.x -= 1f;
+            }
+
+            if (movement.sqrMagnitude > 1f)
+            {
+                movement = movement.normalized;
+            }
+
+            return movement;
+        }
+
+        private static float ReadMouseDeltaX()
+        {
+            Mouse mouse = Mouse.current;
+            if (mouse == null)
+            {
+                return 0f;
+            }
+
+            Vector2 delta = mouse.delta.ReadValue();
+            return delta.x;
         }
     }
 }
